@@ -7,16 +7,16 @@ import java.util.UUID;
 
 public class SelectUserCommand {
     @TargetAggregateIdentifier
-    private UUID userId;
+    private UUID uuid;
     private String userName;
 
-    public SelectUserCommand(UUID userId, String userName) {
-        this.userId = userId;
+    public SelectUserCommand(UUID uuid, String userName) {
+        this.uuid = uuid;
         this.userName = userName;
     }
 
-    public UUID getUserId() {
-        return userId;
+    public UUID getUuid() {
+        return uuid;
     }
 
     public String getUserName() {

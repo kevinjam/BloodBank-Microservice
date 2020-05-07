@@ -6,12 +6,15 @@ import com.kevinjanvier.bloodbanksignupservice.events.UserConfirmedEvent;
 import com.kevinjanvier.bloodbanksignupservice.events.UserCreatedEvent;
 import com.kevinjanvier.bloodbanksignupservice.events.UserSelectedEvent;
 import com.kevinjanvier.bloodbanksignupservice.exceptions.UserException;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 import org.axonframework.commandhandling.CommandHandler;
 import org.axonframework.eventsourcing.EventSourcingHandler;
 import org.axonframework.modelling.command.AggregateIdentifier;
 import org.axonframework.modelling.command.AggregateLifecycle;
 import org.axonframework.spring.stereotype.Aggregate;
 
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -20,10 +23,10 @@ import java.util.UUID;
 public class CreateUser {
 
     @AggregateIdentifier
-    private UUID userId;
-
+    private UUID uuid;
     private Map<UUID, String> selectedUser;
-    boolean confirmed;
+    boolean active;
+    private static final Log log = LogFactory.getLog(CreateUser.class);
 
 
     public CreateUser() {
@@ -32,21 +35,26 @@ public class CreateUser {
     @CommandHandler
     public CreateUser(CreateUserCommand command){
         UUID aggregateId = UUID.randomUUID();
-        AggregateLifecycle.apply(new UserCreatedEvent(aggregateId));
+        log.info("create user command aggregate ID " + aggregateId);
+        AggregateLifecycle.apply(new UserCreatedEvent(aggregateId, command.getName(),command.getEmail(), command.getUsername(),
+                command.getPassword(), command.getAddress(), active,LocalDate.now(),LocalDate.now()));
     }
 
     @CommandHandler
     public void handle(SelectUserCommand command) throws UserException {
-        if (!selectedUser.containsKey(command.getUserId())){
-            throw new UserException();
+        if (!selectedUser.containsKey(command.getUuid())){
+            throw new UserException("");
         }
-        AggregateLifecycle.apply(new UserSelectedEvent(userId, command.getUserName()));
+        AggregateLifecycle.apply(new UserSelectedEvent(uuid, command.getUserName()));
+        log.info("Handle Selected command " + command);
     }
 
     @EventSourcingHandler
     public void on(UserCreatedEvent event){
-         userId = event.getUserId();
+         uuid = event.getUuid();
          selectedUser = new HashMap<>();
+        log.info("handle usercreated event ---  " + event);
+
     }
 
     @EventSourcingHandler
@@ -56,6 +64,7 @@ public class CreateUser {
 
     @EventSourcingHandler
     public void on(UserConfirmedEvent event){
-     confirmed = true;
+        log.info("------User Confirm event " + event);
+     active = true;
     }
 }

@@ -3,13 +3,15 @@ package com.kevinjanvier.bloodbanksignupservice.query;
 import java.util.UUID;
 
 public class FindUserQuery {
-    private UUID userId;
+    private UUID uuid;
 
-    public FindUserQuery(UUID userId) {
-        this.userId = userId;
+
+
+    public FindUserQuery(UUID uuid) {
+        this.uuid = uuid;
     }
 
-    public UUID getUserId() {
-        return userId;
+    public UUID getUuid() {
+        return uuid;
     }
 }
